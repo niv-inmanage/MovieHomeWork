@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatImageView;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -16,8 +15,9 @@ import android.widget.TextView;
 import com.example.niv.moviehomework.MainActivity;
 import com.example.niv.moviehomework.Movie;
 import com.example.niv.moviehomework.R;
-import com.example.niv.moviehomework.Utils.DownloadJsonWithUrl;
+import com.example.niv.moviehomework.Utils.BaseFragment;
 import com.example.niv.moviehomework.Utils.ParseJson;
+import com.example.niv.moviehomework.Utils.RequestManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +31,7 @@ import java.util.List;
  * Created by niv on 1/5/2017.
  */
 
-public class MovieDetailsFragment extends Fragment {
+public class MovieDetailsFragment extends BaseFragment {
 
     TextView nameView,yearView,categoryView,rateView,trailerView,descView;
     AppCompatImageView imageView;
@@ -66,36 +66,28 @@ public class MovieDetailsFragment extends Fragment {
         yearView.setText("Year:"+" "+selectedMovie.getYear());
         categoryView.setText(selectedMovie.getCategory());
 
-        downLoadImage.start();
-
-        new DownloadJsonWithUrl(getActivity(),descUrl,urlCallBack);
+        RequestManager manager = new RequestManager(getActivity(),managerCallBack); // manage server download
+        manager.imageRequest(imageUrl);
+        manager.jsonRequest(descUrl);
 
         return layout;
     }
-    Thread downLoadImage = new Thread(new Runnable() {
+
+    RequestManager.RequestManagerCallBack managerCallBack = new RequestManager.RequestManagerCallBack() {
         @Override
-        public void run() {
-            Bitmap bitmap = null;
-            try {
-                bitmap = BitmapFactory.decodeStream((InputStream)new URL(imageUrl).getContent());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            final Drawable d = new BitmapDrawable(getResources(), bitmap);
+        public void JsonRespond(List<JSONObject> jsonObjectList) {
+            getDataFromJson(jsonObjectList.get(0));
+        }
+
+        @Override
+        public void imageRespond(Bitmap image) {
+            final Drawable d = new BitmapDrawable(getResources(), image);
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     imageView.setBackground(d);
                 }
             });
-        }
-    });
-
-    DownloadJsonWithUrl.DownloadJsonWithUrlCallBack urlCallBack = new DownloadJsonWithUrl.DownloadJsonWithUrlCallBack() {
-        @Override
-        public void downloadData(List<JSONObject> jsonObjectList) {
-            getDataFromJson(jsonObjectList.get(0));
-
         }
     };
 

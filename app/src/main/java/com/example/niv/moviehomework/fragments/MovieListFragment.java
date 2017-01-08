@@ -21,6 +21,7 @@ import android.widget.ListView;
 import com.example.niv.moviehomework.MainActivity;
 import com.example.niv.moviehomework.Movie;
 import com.example.niv.moviehomework.R;
+import com.example.niv.moviehomework.Utils.BaseFragment;
 import com.example.niv.moviehomework.Utils.ParseJson;
 import com.example.niv.moviehomework.adapters.CategoryListAdapter;
 import com.example.niv.moviehomework.adapters.MovieListAdapter;
@@ -36,7 +37,7 @@ import java.util.Locale;
  * Created by niv on 1/5/2017.
  */
 
-public class MovieListFragment extends Fragment implements View.OnClickListener, TextWatcher, View.OnTouchListener, AdapterView.OnItemClickListener {
+public class MovieListFragment extends BaseFragment implements View.OnClickListener, TextWatcher, View.OnTouchListener, AdapterView.OnItemClickListener {
 
     ListView movieListView;
     RecyclerView categoryList;

@@ -15,6 +15,8 @@ import android.widget.Button;
 
 import com.example.niv.moviehomework.MainActivity;
 import com.example.niv.moviehomework.R;
+import com.example.niv.moviehomework.Utils.BaseFragment;
+import com.example.niv.moviehomework.Utils.RequestManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,12 +25,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Created by niv on 1/5/2017.
  */
 
-public class AdvertiseFragment extends Fragment implements View.OnClickListener {
+public class AdvertiseFragment extends BaseFragment implements View.OnClickListener {
 
     String imageUrl,video;
     AppCompatImageView background;
@@ -59,30 +62,26 @@ public class AdvertiseFragment extends Fragment implements View.OnClickListener 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        downloadImage(); // get the image from with url
+        new RequestManager(getActivity(),managerCallBack).imageRequest(imageUrl); // get the image from with url
     }
 
-    private void downloadImage(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Bitmap bitmap = null;
-                try {
-//                bitmap = BitmapFactory.decodeStream((InputStream)new URL(imageUrl).getContent()); // This method should be but the url is incorrect
-                    bitmap = BitmapFactory.decodeStream((InputStream)new URL("http://x-mode.co.il/exam/allMovies/bannerImage.jpg").getContent());
-                } catch (IOException e) {
-                    e.printStackTrace();
+    RequestManager.RequestManagerCallBack managerCallBack = new RequestManager.RequestManagerCallBack() {
+        @Override
+        public void JsonRespond(List<JSONObject> jsonObjectList) {
+
+        }
+
+        @Override
+        public void imageRespond(Bitmap image) {
+            final Drawable d = new BitmapDrawable(getResources(), image);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    background.setBackground(d);
                 }
-                final Drawable d = new BitmapDrawable(getResources(), bitmap);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        background.setBackground(d);
-                    }
-                });
-            }
-        }).start();
-    }
+            });
+        }
+    };
 
     @Override
     public void onClick(View view) {

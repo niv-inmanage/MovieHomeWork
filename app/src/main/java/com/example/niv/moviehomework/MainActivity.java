@@ -1,5 +1,6 @@
 package com.example.niv.moviehomework;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,17 +34,24 @@ public class MainActivity extends AppCompatActivity implements OpenFragment.Open
         }
     }
 
+    private void pushFragment(Fragment fragment){
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
+    }
 
     // OpenFragment call back
     @Override
     public void downloadData(List<JSONObject> jsonObjectList) {
-        movieJson = jsonObjectList.get(0);
-        advertiseJson = jsonObjectList.get(1);
+        if (jsonObjectList.size()>0) {
+            movieJson = jsonObjectList.get(1);
+            advertiseJson = jsonObjectList.get(0);
+        }
 
         AdvertiseFragment advertiseFragment = new AdvertiseFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, advertiseFragment);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
     }
 
 //    AdvertiseFragment call back

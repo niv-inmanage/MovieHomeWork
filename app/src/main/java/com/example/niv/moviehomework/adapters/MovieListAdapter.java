@@ -7,18 +7,10 @@ package com.example.niv.moviehomework.adapters;
         import android.widget.BaseAdapter;
         import android.widget.TextView;
 
-        import com.example.niv.moviehomework.MainActivity;
         import com.example.niv.moviehomework.Movie;
         import com.example.niv.moviehomework.R;
-        import com.example.niv.moviehomework.Utils.DownloadJsonWithUrl;
-        import com.example.niv.moviehomework.Utils.ParseJson;
-
-        import org.json.JSONException;
-        import org.json.JSONObject;
 
         import java.util.ArrayList;
-        import java.util.Collections;
-        import java.util.Comparator;
         import java.util.List;
         import java.util.Locale;
 
