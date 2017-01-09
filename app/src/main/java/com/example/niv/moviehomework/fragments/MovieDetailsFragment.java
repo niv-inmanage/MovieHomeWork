@@ -1,7 +1,6 @@
 package com.example.niv.moviehomework.fragments;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -16,15 +15,12 @@ import com.example.niv.moviehomework.MainActivity;
 import com.example.niv.moviehomework.Movie;
 import com.example.niv.moviehomework.R;
 import com.example.niv.moviehomework.Utils.BaseFragment;
-import com.example.niv.moviehomework.Utils.ParseJson;
 import com.example.niv.moviehomework.Utils.RequestManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -52,15 +48,12 @@ public class MovieDetailsFragment extends BaseFragment {
         descView = (TextView) layout.findViewById(R.id.movie_desc);
         imageView = (AppCompatImageView) layout.findViewById(R.id.movie_image);
 
-        int position = getArguments().getInt("position");
+        int selectedMovieId = getArguments().getInt("position");
 
-        try {
-            selectedMovie = new ParseJson().getMovieFromJsonById(MainActivity.movieJson,position);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String[] descUrl = {"http://x-mode.co.il/exam/descriptionMovies/"+selectedMovie.getId()+".txt"};
-        imageUrl = "http://x-mode.co.il/exam/descriptionMovies/"+selectedMovie.getId()+".jpg";
+        selectedMovie = getMovieById(MainActivity.movieList,selectedMovieId);
+
+        String[] descUrl = {"http://x-mode.co.il/exam/descriptionMovies/"+selectedMovieId+".txt"};
+        imageUrl = "http://x-mode.co.il/exam/descriptionMovies/"+selectedMovieId+".jpg";
 
         nameView.setText(selectedMovie.getName());
         yearView.setText("Year:"+" "+selectedMovie.getYear());
@@ -68,14 +61,28 @@ public class MovieDetailsFragment extends BaseFragment {
 
         RequestManager manager = new RequestManager(getActivity(),managerCallBack); // manage server download
         manager.imageRequest(imageUrl);
-        manager.jsonRequest(descUrl);
+        manager.jsonObjectRequest(descUrl);
 
         return layout;
     }
 
+    private Movie getMovieById(List<Movie> movieList, int id){
+        for (int i=0;i<movieList.size();i++){
+            if (movieList.get(i).getId() == id)
+                return movieList.get(i);
+        }
+        return null;
+    }
+
     RequestManager.RequestManagerCallBack managerCallBack = new RequestManager.RequestManagerCallBack() {
+
         @Override
-        public void JsonRespond(List<JSONObject> jsonObjectList) {
+        public void JsonArrayRespond(List<JSONArray> jsonObjectList) {
+
+        }
+
+        @Override
+        public void JsonObjectRespond(List<JSONObject> jsonObjectList) {
             getDataFromJson(jsonObjectList.get(0));
         }
 
