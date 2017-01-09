@@ -67,7 +67,12 @@ public class AdvertiseFragment extends BaseFragment implements View.OnClickListe
 
     RequestManager.RequestManagerCallBack managerCallBack = new RequestManager.RequestManagerCallBack() {
         @Override
-        public void JsonRespond(List<JSONObject> jsonObjectList) {
+        public void JsonArrayRespond(List<JSONArray> jsonObjectList) {
+
+        }
+
+        @Override
+        public void JsonObjectRespond(List<JSONObject> jsonObjectList) {
 
         }
 

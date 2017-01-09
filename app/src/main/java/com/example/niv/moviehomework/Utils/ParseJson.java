@@ -16,20 +16,36 @@ import java.util.List;
 
 public class ParseJson {
 
-    public List<Movie> getListOfJsonObjects(JSONObject jsonObject) throws JSONException {
+    public List<Movie> getListOfMovies(JSONObject jsonObject) throws JSONException {
+        String name = null;
+        String year=null;
+        String category=null;
+
         // Getting JSON Array node
-        JSONArray movies = jsonObject.getJSONArray("movies");
+        JSONArray movies = null;
+
+        movies = jsonObject.getJSONArray("movies");
 
         List<Movie> movieList = new ArrayList<>();
         // looping through All Contacts
         for (int i = 0; i < movies.length(); i++) {
-            JSONObject m = movies.getJSONObject(i);
+            JSONObject m = null;
+            try {
+                m = movies.getJSONObject(i);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-            int id = m.getInt("id");
-            String name = m.getString("name");
-            String year = m.getString("year");
-            String category = m.getString("category");
-//            int rate = m.getInt("rate");
+            int id = 0;
+            try {
+                id = m.getInt("id");
+                name = m.getString("name");
+                year = m.getString("year");
+                category = m.getString("category");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
 
             Movie movie = new Movie(0, null, null, null,0);
 
@@ -37,37 +53,10 @@ public class ParseJson {
             movie.setName(name);
             movie.setYear(year);
             movie.setCategory(category);
-//            movie.setRate(rate);
 
             // adding contact to contact list
             movieList.add(movie);
         }
         return movieList;
-    }
-    public Movie getMovieFromJsonById(JSONObject jsonObject, int id) throws JSONException {
-        // Getting JSON Array node
-        JSONArray movies = jsonObject.getJSONArray("movies");
-
-        for (int i = 0; i < movies.length(); i++) {
-            JSONObject m = movies.getJSONObject(i);
-            if (m.getInt("id")== id){
-                int movieId = m.getInt("id");
-                String name = m.getString("name");
-                String year = m.getString("year");
-                String category = m.getString("category");
-//                int rate = m.getInt("rate");
-
-                Movie movie = new Movie(0, null, null, null,0);
-
-                movie.setId(movieId);
-                movie.setName(name);
-                movie.setYear(year);
-                movie.setCategory(category);
-//                movie.setRate(rate);
-
-                return movie;
-            }
-        }
-        return null;
     }
 }

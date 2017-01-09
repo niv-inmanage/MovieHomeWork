@@ -22,20 +22,20 @@ public class MovieListAdapter extends BaseAdapter {
 
     Context context;
     LayoutInflater inflater;
-    List<Movie> movieList;
+    List<Movie> adapterMovieList = new ArrayList<>();
     List<Movie> arraylist;
 
-    public MovieListAdapter(Context context, List<Movie> movieList) {
+    public MovieListAdapter(Context context, List<Movie> adapterMovieList) {
         this.context = context;
-        this.movieList = movieList;
+        this.adapterMovieList.addAll(adapterMovieList);
         this.arraylist = new ArrayList<Movie>();
-        this.arraylist.addAll(movieList);
+        this.arraylist.addAll(adapterMovieList);
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount() {
-        return movieList.size();
+        return adapterMovieList.size();
     }
 
     @Override
@@ -62,25 +62,25 @@ public class MovieListAdapter extends BaseAdapter {
         holder.movieYear=(TextView) rowView.findViewById(R.id.movie_year);
         holder.movieRate=(TextView) rowView.findViewById(R.id.movie_rate);
 
-        holder.movieName.setText(movieList.get(i).getName());
-        holder.movieYear.setText(movieList.get(i).getYear());
+        holder.movieName.setText(adapterMovieList.get(i).getName());
+        holder.movieYear.setText(adapterMovieList.get(i).getYear());
+        holder.movieRate.setText("Rate:"+" "+ adapterMovieList.get(i).getRate());
 
-//        holder.movieRate.setText(movieList.get(i).getRate());
         return rowView;
     }
 
     // Filter Class
     public void filter(String charText,String category) {
         charText = charText.toLowerCase(Locale.getDefault());
-        movieList.clear();
+        adapterMovieList.clear();
         if (charText.length() == 0 && category.equals("All")) {
-            movieList.addAll(arraylist);
+            adapterMovieList.addAll(arraylist);
         }
         else {
             for (Movie m : arraylist) {
                 if (m.getName().toLowerCase(Locale.getDefault()).contains(charText)
                         && (m.getCategory().equals(category) || category.equals("All"))) {
-                    movieList.add(m);
+                    adapterMovieList.add(m);
                 }
             }
         }

@@ -7,11 +7,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.niv.moviehomework.R;
 import com.example.niv.moviehomework.Utils.BaseFragment;
 import com.example.niv.moviehomework.Utils.RequestManager;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -25,7 +27,6 @@ public class OpenFragment extends BaseFragment {
     String[] urls = {"http://x-mode.co.il/exam/allMovies/allMovies.txt",
             "http://x-mode.co.il/exam/allMovies/generalDeclaration.txt"};
 
-    private ProgressDialog pDialog;
 
     OpenFragmentCallBack callBack;
     public interface OpenFragmentCallBack{
@@ -36,14 +37,22 @@ public class OpenFragment extends BaseFragment {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.open_fragment_layout, container, false);
 
-        new RequestManager(getActivity(),managerCallBack).jsonRequest(urls);
+        new RequestManager(getActivity(),managerCallBack).jsonObjectRequest(urls);
         return layout;
     }
+
     RequestManager.RequestManagerCallBack managerCallBack = new RequestManager.RequestManagerCallBack() {
         @Override
-        public void JsonRespond(List<JSONObject> jsonObjectList) {
-            if (callBack!=null)
-                callBack.downloadData(jsonObjectList);
+        public void JsonArrayRespond(List<JSONArray> jsonObjectList) {
+
+        }
+
+        @Override
+        public void JsonObjectRespond(List<JSONObject> jsonObjectList) {
+            if (jsonObjectList!=null) {
+                if (callBack != null)
+                    callBack.downloadData(jsonObjectList);
+            } else Toast.makeText(getContext(),"Can't connect to server",Toast.LENGTH_LONG).show();
         }
 
         @Override

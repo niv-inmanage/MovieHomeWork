@@ -1,8 +1,8 @@
 package com.example.niv.moviehomework.fragments;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,11 +23,14 @@ import com.example.niv.moviehomework.Movie;
 import com.example.niv.moviehomework.R;
 import com.example.niv.moviehomework.Utils.BaseFragment;
 import com.example.niv.moviehomework.Utils.ParseJson;
+import com.example.niv.moviehomework.Utils.RequestManager;
 import com.example.niv.moviehomework.adapters.CategoryListAdapter;
 import com.example.niv.moviehomework.adapters.MovieListAdapter;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -47,9 +50,9 @@ public class MovieListFragment extends BaseFragment implements View.OnClickListe
     ListView drawerList;
     android.support.v7.app.ActionBarDrawerToggle drawerToggle;
 
+    List<Movie> movieList = new ArrayList<>();
     private String[] mNavigationDrawerItemTitles;
     MovieListAdapter movieListAdapter;
-    List<Movie> movieList;
     String searchInput = "",chosenCategory = "All";
 
     MovieListFragmentCallBack callBack;
@@ -61,12 +64,7 @@ public class MovieListFragment extends BaseFragment implements View.OnClickListe
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.movie_list_fragment_layout, container, false);
 
-        try {
-            movieList = new ParseJson().getListOfJsonObjects(MainActivity.movieJson);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+        this.movieList.addAll(MainActivity.movieList);
         drawerLayout = (DrawerLayout) layout.findViewById(R.id.drawer_layout);
         drawerList = (ListView) layout.findViewById(R.id.left_drawer);
         mNavigationDrawerItemTitles= getResources().getStringArray(R.array.navigation_drawer_items_array);
@@ -108,13 +106,17 @@ public class MovieListFragment extends BaseFragment implements View.OnClickListe
                     callBack.moviePressed(movieList.get(position).getId());
                 break;
             case R.id.left_drawer:
-                searchInput = "";
-                chosenCategory = "All";
-                movieListAdapter.filter(searchInput, chosenCategory);
-                sortListBy(Movie.sortType.NAME);
-                if (position == 1)
-                    sortListBy(Movie.sortType.YEAR);
-                movieListAdapter = new MovieListAdapter(getContext(), movieList);
+                switch (position){
+                    case 0:
+                        sortListBy(Movie.sortType.NAME);
+                        break;
+                    case 1:
+                        sortListBy(Movie.sortType.YEAR);
+                        break;
+                }
+//                List<Movie> tempMovieList = new ArrayList<>();
+                movieListAdapter = new MovieListAdapter(getContext(),movieList);
+                movieListAdapter.filter(searchInput,chosenCategory);
                 movieListView.setAdapter(movieListAdapter);
 
                 drawerLayout.closeDrawer(drawerList);
