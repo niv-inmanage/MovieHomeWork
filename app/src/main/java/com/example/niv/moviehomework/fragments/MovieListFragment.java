@@ -1,7 +1,6 @@
 package com.example.niv.moviehomework.fragments;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,13 +21,8 @@ import com.example.niv.moviehomework.MainActivity;
 import com.example.niv.moviehomework.Movie;
 import com.example.niv.moviehomework.R;
 import com.example.niv.moviehomework.Utils.BaseFragment;
-import com.example.niv.moviehomework.Utils.ParseJson;
-import com.example.niv.moviehomework.Utils.RequestManager;
 import com.example.niv.moviehomework.adapters.CategoryListAdapter;
 import com.example.niv.moviehomework.adapters.MovieListAdapter;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +36,7 @@ import java.util.Locale;
 
 public class MovieListFragment extends BaseFragment implements View.OnClickListener, TextWatcher, View.OnTouchListener, AdapterView.OnItemClickListener {
 
-    ListView movieListView;
+    RecyclerView movieListView;
     RecyclerView categoryList;
     Button sortButton;
     EditText searchMovieView;
@@ -84,11 +78,8 @@ public class MovieListFragment extends BaseFragment implements View.OnClickListe
         categoryList = (RecyclerView) layout.findViewById(R.id.category_list);
         setCategoryListAdapter();
 
-        movieListView = (ListView) layout.findViewById(R.id.movie_list);
-        sortListBy(Movie.sortType.YEAR);
-        movieListAdapter = new MovieListAdapter(getContext(),movieList);
-        movieListView.setAdapter(movieListAdapter);
-        movieListView.setOnItemClickListener(this);
+        movieListView = (RecyclerView) layout.findViewById(R.id.movie_list);
+        setMovieListAdapter();
         return layout;
     }
 
@@ -98,13 +89,24 @@ public class MovieListFragment extends BaseFragment implements View.OnClickListe
         drawerToggle.syncState();
     }
 
+    MovieListAdapter.MovieListAdapterCallBack movieListAdapterCallBack = new MovieListAdapter.MovieListAdapterCallBack() {
+        @Override
+        public void moviePressed(int position) {
+            if (callBack!=null)
+                callBack.moviePressed(movieList.get(position).getId());
+        }
+    };
+    CategoryListAdapter.CategoryListAdapterCallBack adapterCallBack = new CategoryListAdapter.CategoryListAdapterCallBack() {
+        @Override
+        public void categoryChose(String categoryName) {
+            chosenCategory = categoryName;
+            movieListAdapter.filter(searchInput,chosenCategory);
+        }
+    };
+
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
         switch (adapterView.getId()) {
-            case R.id.movie_list:
-                if (callBack!=null)
-                    callBack.moviePressed(movieList.get(position).getId());
-                break;
             case R.id.left_drawer:
                 switch (position){
                     case 0:
@@ -114,8 +116,7 @@ public class MovieListFragment extends BaseFragment implements View.OnClickListe
                         sortListBy(Movie.sortType.YEAR);
                         break;
                 }
-//                List<Movie> tempMovieList = new ArrayList<>();
-                movieListAdapter = new MovieListAdapter(getContext(),movieList);
+                movieListAdapter = new MovieListAdapter(movieList,movieListAdapterCallBack);
                 movieListAdapter.filter(searchInput,chosenCategory);
                 movieListView.setAdapter(movieListAdapter);
 
@@ -145,13 +146,19 @@ public class MovieListFragment extends BaseFragment implements View.OnClickListe
             categoryList.setAdapter(new CategoryListAdapter(movieList,adapterCallBack));
         categoryList.setLayoutManager(MyLayoutManager);
     }
-    CategoryListAdapter.CategoryListAdapterCallBack adapterCallBack = new CategoryListAdapter.CategoryListAdapterCallBack() {
-        @Override
-        public void categoryChose(String categoryName) {
-            chosenCategory = categoryName;
-            movieListAdapter.filter(searchInput,chosenCategory);
+
+
+    private void setMovieListAdapter(){
+        movieListView.setHasFixedSize(true);
+        LinearLayoutManager MyLayoutManager = new LinearLayoutManager(getActivity());
+        MyLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        if (movieList.size() > 0) {
+            sortListBy(Movie.sortType.YEAR);
+            movieListAdapter = new MovieListAdapter(movieList,movieListAdapterCallBack);
+            movieListView.setAdapter(movieListAdapter);
+            movieListView.setLayoutManager(MyLayoutManager);
         }
-    };
+    }
 
     @Override
     public void onClick(View view) {
@@ -170,7 +177,8 @@ public class MovieListFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void afterTextChanged(Editable editable) {
         searchInput = searchMovieView.getText().toString().toLowerCase(Locale.getDefault());
-        movieListAdapter.filter(searchInput,chosenCategory);
+        if (movieListAdapter!=null)
+            movieListAdapter.filter(searchInput,chosenCategory);
     }
 
     @Override

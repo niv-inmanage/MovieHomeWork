@@ -1,72 +1,75 @@
 package com.example.niv.moviehomework.adapters;
 
-        import android.content.Context;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.widget.BaseAdapter;
-        import android.widget.TextView;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
-        import com.example.niv.moviehomework.Movie;
-        import com.example.niv.moviehomework.R;
+import com.example.niv.moviehomework.Movie;
+import com.example.niv.moviehomework.R;
 
-        import java.util.ArrayList;
-        import java.util.List;
-        import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
- * Created by niv on 1/5/2017.
+ * Created by niv on 1/11/2017.
  */
 
-public class MovieListAdapter extends BaseAdapter {
-
-    Context context;
-    LayoutInflater inflater;
-    List<Movie> adapterMovieList = new ArrayList<>();
-    List<Movie> arraylist;
-
-    public MovieListAdapter(Context context, List<Movie> adapterMovieList) {
-        this.context = context;
-        this.adapterMovieList.addAll(adapterMovieList);
-        this.arraylist = new ArrayList<Movie>();
-        this.arraylist.addAll(adapterMovieList);
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    }
-
-    @Override
-    public int getCount() {
-        return adapterMovieList.size();
-    }
-
-    @Override
-    public Object getItem(int i) {
-        return i;
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
-
-    public class Holder
-    {
+public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.ViewHolder>{
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView movieName;
         TextView movieYear;
         TextView movieRate;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            movieName = (TextView) itemView.findViewById(R.id.movie_name);
+            movieYear = (TextView) itemView.findViewById(R.id.movie_year);
+            movieRate = (TextView) itemView.findViewById(R.id.movie_rate);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (callBack!=null)
+                callBack.moviePressed(this.getLayoutPosition());
+        }
     }
+
+    List<Movie> adapterMovieList = new ArrayList<>();
+    List<Movie> arraylist;
+
+    MovieListAdapterCallBack callBack;
+    public interface MovieListAdapterCallBack{
+        void moviePressed(int position);
+    }
+    public MovieListAdapter(List<Movie> adapterMovieList,MovieListAdapterCallBack callBack) {
+        this.adapterMovieList.addAll(adapterMovieList);
+        this.arraylist = new ArrayList<Movie>();
+        this.arraylist.addAll(adapterMovieList);
+        this.callBack = callBack;
+    }
+
     @Override
-    public View getView(int i, View rowView, ViewGroup viewGroup) {
-        Holder holder=new Holder();
-        rowView = inflater.inflate(R.layout.movie_list_custom_row, null);
-        holder.movieName=(TextView) rowView.findViewById(R.id.movie_name);
-        holder.movieYear=(TextView) rowView.findViewById(R.id.movie_year);
-        holder.movieRate=(TextView) rowView.findViewById(R.id.movie_rate);
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // create a new view
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_list_custom_row, parent, false);
+        ViewHolder holder = new ViewHolder(view);
+        return holder;
+    }
 
-        holder.movieName.setText(adapterMovieList.get(i).getName());
-        holder.movieYear.setText(adapterMovieList.get(i).getYear());
-        holder.movieRate.setText("Rate:"+" "+ adapterMovieList.get(i).getRate());
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        holder.movieName.setText(adapterMovieList.get(position).getName());
+        holder.movieYear.setText(adapterMovieList.get(position).getYear());
+        holder.movieRate.setText("Rate:"+" "+ adapterMovieList.get(position).getRate());
+    }
 
-        return rowView;
+    @Override
+    public int getItemCount() {
+        return adapterMovieList.size();
     }
 
     // Filter Class

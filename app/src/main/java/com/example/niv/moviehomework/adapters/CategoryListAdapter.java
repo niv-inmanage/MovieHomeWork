@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.example.niv.moviehomework.Movie;
 import com.example.niv.moviehomework.R;
@@ -15,7 +16,24 @@ import java.util.List;
  * Created by niv on 1/5/2017.
  */
 
-public class CategoryListAdapter extends RecyclerView.Adapter<CategoryViewHolder>{
+public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapter.ViewHolder>{
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        Button categoryButton;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            categoryButton = (Button) itemView.findViewById(R.id.category_button);
+            categoryButton.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            Button b = (Button)view;
+            String categoryName = b.getText().toString();
+            if (callBack!=null)
+                callBack.categoryChose(categoryName);
+        }
+    }
 
     List<String> categoryList;
 
@@ -29,22 +47,15 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryViewHolder
     }
 
     @Override
-    public CategoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_list_custom_row, parent, false);
-        CategoryViewHolder holder = new CategoryViewHolder(view,holderCallBack);
+        ViewHolder holder = new ViewHolder(view);
         return holder;
     }
-    CategoryViewHolder.CategoryViewHolderCallBack holderCallBack = new CategoryViewHolder.CategoryViewHolderCallBack() {
-        @Override
-        public void categoryChose(String categoryName) {
-            if (callBack!=null)
-                callBack.categoryChose(categoryName);
-        }
-    };
 
     @Override
-    public void onBindViewHolder(CategoryViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         if (position==0)
             holder.categoryButton.setText("All");
 
